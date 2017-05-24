@@ -1,10 +1,15 @@
 \documentclass{article}
 \usepackage{mathtools}
-
+\title{Neural Network}
+\author{Jack Schamburg}
 \begin{document}
+\maketitle
+\newpage
+
 \section{Manual calculation for a small neural network}
+
 \subsection{Forward propagation steps}
-Steps for the manual calculation of the given neural network. Numbers are 
+Steps for the manual calculation of the given neural network. Numbers are
 rounded to 3 decimal places.\\
 \\Let $W_1 =
 \begin{bmatrix}
@@ -31,11 +36,19 @@ w_7 & w_8 \\
 \end{bmatrix}$ \\
 \\
 \\If $X = \begin{bmatrix}
+0.1 &  0.1 \\
+0.1 &  0.2 \\
+\end{bmatrix}$ with labels $Y = \begin{bmatrix}
+1 & 0 \\
+0 &  1 \\
+\end{bmatrix}$ \\
+\\
+\\Augment $X$ to accomodate for bias synapses in $W_1$:
+\\If $X = \begin{bmatrix}
 1 & 1 \\
 0.1 &  0.1 \\
 0.1 &  0.2 \\
 \end{bmatrix}$\\
-\\
 \\$S_1 = W_1^TX =
 \begin{bmatrix}
 0.1 & 0.1 & 0.1 \\
@@ -52,20 +65,20 @@ w_7 & w_8 \\
 \end{bmatrix}$\\
 \\\\Let $\sigma(x) = \cfrac{1}{1 + e^{-x}}$\\
 \\
-\\$H = \sigma(S_1) = 
+\\$H = \sigma(S_1) =
 \begin{bmatrix}
 0.530 & 0.532 \\
 0.532 & 0.535 \\
 \end{bmatrix}$\\
 \\\\Augment $H$ to accomodate for bias synapses in $W_2$:\\
-$H = 
+$H =
 \begin{bmatrix}
 1 & 1 \\
 0.530 & 0.532 \\
 0.532 & 0.535 \\
 \end{bmatrix}$\\
 \\
-\\$S_2 = W_2^TH = 
+\\$S_2 = W_2^TH =
 \begin{bmatrix}
 0.1 & 0.1 & 0.1 \\
 0.1 & 0.2 & 0.1 \\
@@ -74,40 +87,106 @@ $H =
 1 & 1 \\
 0.530 & 0.532 \\
 0.532 & 0.535 \\
-\end{bmatrix} = 
+\end{bmatrix} =
 \begin{bmatrix}
 0.206 & 0.207 \\
-0.256 & 0.260 \\
+0.259 & 0.260 \\
 \end{bmatrix}$\\
 \\
-\\$Y = \sigma(S_2) = 
+\\$\hat{Y} = \sigma(S_2) =
 \begin{bmatrix}
 0.551 & 0.552 \\
 0.565 & 0.565 \\
 \end{bmatrix}$
+
+\subsection{Back propagation steps}
+Steps for performing back propagation on each of the weights. Numbers will be
+rounded to 3 decimal places in documentation but full decimal will be used in
+calculations.\\
+\\Let $E$ be the mean squared error function:\\
+\\$E = \cfrac{1}{2}\sum_{i=1}^{K}(Y_i-\hat{Y}_i)^2$ where $K$ is the number of
+inputs in $X$\\
+
+\subsubsection{Calculating $\cfrac{\partial E}{\partial W_2}$}
+$\cfrac{\partial E}{\partial W_2} = -\sum_{i=1}^{K} (Y_i - \hat{Y}_i) \cdot
+\cfrac{\partial\hat{Y}_i}{\partial W_2}$\\
+\\$\cfrac{\partial E}{\partial W_2} = -\sum_{i=1}^{K} (Y_i - \hat{Y}_i) \cdot
+\cfrac{\partial\hat{Y}_i}{\partial S_2}\cdot\cfrac{\partial S_2}{\partial W_2}$\\
+\\Let $\sigma^\prime(z) = \sigma(z)\cdot(1 - \sigma(z))$\\
+\\$\cfrac{\partial\hat{Y}}{\partial S_2} = \sigma^\prime(S_2)$\\
+\\$\cfrac{\partial S_2}{\partial W_2} = H$\\
+\\$\cfrac{\partial E}{\partial W_2} = -(Y - \hat{Y})
+\sigma^\prime(S_2)\cdot H$\\
+\\$Note$: No need for sumation symbol as dot product of $H$ with $-(Y - \hat{Y})\cdot
+\sigma^\prime(S_2)$ will add each together by definition. Also, $-(Y - \hat{Y})
+\sigma^\prime(S_2)$ is elementwise matrix multiplication. \\
+\\$-(Y - \hat{Y}) = - (
+\begin{bmatrix}
+1 & 0 \\
+0 & 1 \\
+\end{bmatrix} -
+\begin{bmatrix}
+0.551 & 0.552 \\
+0.565 & 0.565 \\
+\end{bmatrix}
+) =
+\begin{bmatrix}
+-0.449 & 0.552 \\
+0.565 & -0.435 \\
+\end{bmatrix}
+$\\
+\\ $\sigma^\prime(S_2) =
+\begin{bmatrix}
+0.247 & 0.247 \\
+0.246 & 0.246 \\
+\end{bmatrix}$\\
+\\Let $ \delta_1 = -(Y - \hat{Y})\sigma^\prime(S_2)$ which will be later used in
+section 1.2.2\\
+\\ $  \delta_1 =
+\begin{bmatrix}
+-0.449 & 0.552\\
+0.565 & -0.435 \\
+\end{bmatrix}
+\begin{bmatrix}
+0.247 & 0.247 \\
+0.246 & 0.246 \\
+\end{bmatrix} =
+\begin{bmatrix}
+-0.111 & 0.136 \\
+0.139 & -0.107 \\
+\end{bmatrix}$\\
+\\$\cfrac{\partial E}{\partial W_2} = H \cdot
+\begin{bmatrix}
+-0.111 & 0.136 \\
+0.139 & -0.107 \\
+\end{bmatrix}$\\
+\\$\cfrac{\partial E}{\partial W_2} =
+\begin{bmatrix}
+1 & 1 \\
+0.530 & 0.532 \\
+0.532 & 0.535 \\
+\end{bmatrix} \cdot
+\begin{bmatrix}
+-0.111 & 0.136 \\
+0.139 & -0.107 \\
+\end{bmatrix}$\\
+\\$\cfrac{\partial E}{\partial W_2} =
+\begin{bmatrix}
+0.028 & 0.029 \\
+0.015 & 0.015 \\
+0.015 & 0.015 \\
+\end{bmatrix}$\\
+
+\subsubsection{Calculating $\cfrac{\partial E}{\partial W_1}$}
+$\cfrac{\partial E}{\partial W_1} = -(Y- \hat{Y})\cdot
+\cfrac{\partial \hat{Y}}{\partial W_1}$\\
+\\$\cfrac{\partial E}{\partial W_1} = -(Y- \hat{Y})\cdot
+\cfrac{\partial \hat{Y}}{\partial S_2} \cdot \cfrac{\partial S_2}{\partial W_1}$\\
+\\$\cfrac{\partial E}{\partial W_1} = \delta_1 \cdot \cfrac{\partial S_2}{\partial W_1}$\\
+\\$\cfrac{\partial E}{\partial W_1} = \delta_1 \cdot \cfrac{\partial S_2}{\partial H}
+\cdot \cfrac{\partial H}{\partial W_1}$\\
+\\$\cfrac{\partial E}{\partial W_1} = \delta_1 \cdot W_2 \cdot
+\cfrac{\partial H}{\partial S_1} \cdot \cfrac{\partial S_1}{\partial W_1}$\\
+\\$\cfrac{\partial E}{\partial W_1} = \delta_1 \cdot W_2 \cdot
+\sigma^\prime(S_1) \cdot X$\\
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
