@@ -12,18 +12,19 @@ class Neural_Network:
 
 	def mean_square_error(self, X, Y):
 		self.Y_hat = self.forward(X)
-		return 0.5*sum((Y-self.Y_hat)**2)
+		return 0.5*sum(sum((Y-self.Y_hat)**2))
 
 	def generate_partial_derivates(self, X, Y):
 		self.Y_hat = self.forward(X)
 
-		delta2 = np.multiply(-(Y-self.Y_hat), self.sigmoid(self.S2, diff=True))
-		dEdW2 = np.dot(self.H, delta2)
-		print(self.W2 - 0.1*dEdW2)
-		#delta1 = np.dot(delta2, self.W2)
-		#dEdW1 = np.dot(X, delta1)
+		delta2 = np.multiply((self.Y_hat - Y), self.sigmoid(self.S2, diff=True))
+		print(delta2)
+		dEdW2 = np.dot(delta2,self.H)
+		#print(self.W2 - 0.1*dEdW2)
+		delta1 = np.dot(delta2, self.W2[[[1],[2]],[0,1]])
+		dEdW1 = np.dot(X, delta1)
 
-		#return dEdW1, dEdW2
+		return dEdW1, dEdW2
 
 	def update_weights(self, X, Y):
 		self.Y_hat = self.forward(X)
@@ -42,12 +43,23 @@ class Neural_Network:
 cnn = Neural_Network()
 X = np.array([[1, 0.1, 0.1], [1, 0.1, 0.2]]).T
 Y = np.array([[1,0],[0,1]]).T
-print(cnn.forward(X))
+#print(cnn.forward(X))
 #print(cnn.mean_square_error(X,Y))
-print(cnn.S2)#np.array([[0.206,0.207],[0.259]])
-print(cnn.sigmoid(cnn.S2,diff=True))
-cnn.update_weights(X,Y)
+#print(cnn.S2)#np.array([[0.206,0.207],[0.259]])
+#print(cnn.sigmoid(cnn.S2,diff=True))
+E = cnn.mean_square_error(X,Y)
+i=0
+while E > 0.1:
+	i+=1
+	print(i)
+	print(E)
+	cnn.update_weights(X,Y)
+	E = cnn.mean_square_error(X,Y)		
 print(cnn.W2)
+print(cnn.W1)
+#while 
+
+
 # dEdW1,dEdW2 = cnn.generate_partial_derivates(X,Y)
 # print(dEdW2)
 # print(dEdW1)
