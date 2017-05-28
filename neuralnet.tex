@@ -13,52 +13,68 @@ Steps for the manual calculation of the given neural network. Numbers are
 rounded to 3 decimal places.\\
 \\Let $W_1 =
 \begin{bmatrix}
-w_9 & w_{10} \\
 w_1 & w_2 \\
 w_3 & w_4 \\
 \end{bmatrix} =
 \begin{bmatrix}
-0.1 &  0.1\\
 0.1 & 0.2 \\
 0.1 & 0.1 \\
 \end{bmatrix}$\\
 \\
 \\Let $W_2 =
 \begin{bmatrix}
-w_{11} & w_{12} \\
 w_5 & w_6 \\
 w_7 & w_8 \\
 \end{bmatrix} =
 \begin{bmatrix}
 0.1 & 0.1 \\
-0.1 & 0.1 \\
 0.1 & 0.2 \\
 \end{bmatrix}$ \\
 \\
-\\If $X = \begin{bmatrix}
+\\Let $b_1 = 
+\begin{bmatrix}
+w_9 \\
+w_{10} \\
+\end{bmatrix} = 
+\begin{bmatrix}
+0.1 \\
+0.1 \\
+\end{bmatrix}$\\
+\\
+\\Let $b_2 =
+\begin{bmatrix}
+w_{11} \\
+w_{12} \\
+\end{bmatrix} = 
+\begin{bmatrix}
+0.1 \\
+0.1\\
+\end{bmatrix}$\\
+\\
+\\If $X =
+\begin{bmatrix}
 0.1 &  0.1 \\
 0.1 &  0.2 \\
-\end{bmatrix}$ with labels $Y = \begin{bmatrix}
+\end{bmatrix}$ with labels $Y =
+\begin{bmatrix}
 1 & 0 \\
-0 &  1 \\
+0 & 1 \\
 \end{bmatrix}$ \\
 \\
-\\Augment $X$ to accomodate for bias synapses in $W_1$:
-\\If $X = \begin{bmatrix}
-1 & 1 \\
-0.1 &  0.1 \\
-0.1 &  0.2 \\
-\end{bmatrix}$\\
-\\$S_1 = W_1^TX =
+\\Let the $\oplus$ binary operator be defined as: add each vector element to each of the matrix elements in the same row.\\
+\\$S_1 = W_1^TX \oplus b_1 =
 \begin{bmatrix}
-0.1 & 0.1 & 0.1 \\
-0.1 & 0.2 & 0.1\\
+0.1 & 0.1 \\
+0.2 & 0.1\\
 \end{bmatrix}
 \begin{bmatrix}
-1 & 1 \\
 0.1 &  0.1 \\
 0.1 &  0.2 \\
-\end{bmatrix} =
+\end{bmatrix} \oplus
+\begin{bmatrix}
+0.1 \\
+0.1 \\
+\end{bmatrix}=
 \begin{bmatrix}
 0.12 & 0.13 \\
 0.13 & 0.14 \\
@@ -70,24 +86,21 @@ w_7 & w_8 \\
 0.530 & 0.532 \\
 0.532 & 0.535 \\
 \end{bmatrix}$\\
-\\\\Augment $H$ to accomodate for bias synapses in $W_2$:\\
-$H =
-\begin{bmatrix}
-1 & 1 \\
-0.530 & 0.532 \\
-0.532 & 0.535 \\
-\end{bmatrix}$\\
 \\
-\\$S_2 = W_2^TH =
+\\$S_2 = W_2^TH \oplus b_2 =
 \begin{bmatrix}
-0.1 & 0.1 & 0.1 \\
-0.1 & 0.2 & 0.1 \\
+0.1 & 0.1 \\
+0.1 & 0.2 \\
 \end{bmatrix}
 \begin{bmatrix}
-1 & 1 \\
 0.530 & 0.532 \\
 0.532 & 0.535 \\
-\end{bmatrix} =
+\end{bmatrix} \oplus
+\begin{bmatrix}
+0.1 \\
+0.1 \\
+\end{bmatrix}
+=
 \begin{bmatrix}
 0.206 & 0.207 \\
 0.259 & 0.260 \\
@@ -98,55 +111,47 @@ $H =
 0.551 & 0.552 \\
 0.565 & 0.565 \\
 \end{bmatrix}$
+\clearpage
 
 \subsection{Back propagation steps}
 Steps for performing back propagation on each of the weights. Numbers will be
 rounded to 3 decimal places in documentation but full decimal will be used in
 calculations.\\
 \\Let $E$ be the mean squared error function:\\
-\\$E = \cfrac{1}{2}\sum_{i=1}^{K}(Y_i-\hat{Y}_i)^2$ where $K$ is the number of
-inputs in $X$\\
+\\$E = \displaystyle \sum_{i=1}^{K}\cfrac{1}{K}(Y_i-\hat{Y}_i)^2$\\\\ Where $K$ is the number of samples; number of rows in $X$ and $Y$.\\
 
 \subsubsection{Calculating $\cfrac{\partial E}{\partial W_2}$}
-$\cfrac{\partial E}{\partial W_2} = -\sum_{i=1}^{K} (Y_i - \hat{Y}_i) \cdot
-\cfrac{\partial\hat{Y}_i}{\partial W_2}$\\
-\\$\cfrac{\partial E}{\partial W_2} = -\sum_{i=1}^{K} (Y_i - \hat{Y}_i) \cdot
-\cfrac{\partial\hat{Y}_i}{\partial S_2}\cdot\cfrac{\partial S_2}{\partial W_2}$\\
+$\cfrac{\partial E}{\partial W_2} = \displaystyle \sum_{i=1}^{2} (\hat{Y}_i - Y_i) \cdot \cfrac{\partial\hat{Y}_i}{\partial W_2}$\\
+\\$\cfrac{\partial E}{\partial W_2} = \displaystyle \sum_{i=1}^{2} (Y_i - \hat{Y}_i)\cdot \cfrac{\partial\hat{Y}_i}{\partial S_2}\cdot \cfrac{\partial S_2}{\partial W_2}$\\
 \\Let $\sigma^\prime(z) = \sigma(z)\cdot(1 - \sigma(z))$\\
 \\$\cfrac{\partial\hat{Y}}{\partial S_2} = \sigma^\prime(S_2)$\\
-\\$\cfrac{\partial S_2}{\partial W_2} = H$\\
-\\$\cfrac{\partial E}{\partial W_2} = -(Y - \hat{Y})
-\sigma^\prime(S_2)\cdot H$\\
-\\$Note$: No need for sumation symbol as dot product of $H$ with $-(Y - \hat{Y})\cdot
-\sigma^\prime(S_2)$ will add each together by definition. Also, $-(Y - \hat{Y})
-\sigma^\prime(S_2)$ is elementwise matrix multiplication. \\
-\\$-(Y - \hat{Y}) = - (
-\begin{bmatrix}
-1 & 0 \\
-0 & 1 \\
-\end{bmatrix} -
+\\$\cfrac{\partial S_2}{\partial W_2} = H^T$\\
+\\$\cfrac{\partial E}{\partial W_2} = \displaystyle \sum_{i=1}^{2}\{[(\hat{Y}_i - Y_i) \odot \sigma^\prime(S_2)] \cdot H^T\}$\\
+\\$(\hat{Y} - Y) = 
 \begin{bmatrix}
 0.551 & 0.552 \\
 0.565 & 0.565 \\
-\end{bmatrix}
-) =
+\end{bmatrix} - 
+\begin{bmatrix}
+1 & 0 \\
+0 & 1 \\
+\end{bmatrix} =
 \begin{bmatrix}
 -0.449 & 0.552 \\
 0.565 & -0.435 \\
-\end{bmatrix}
-$\\
-\\ $\sigma^\prime(S_2) =
+\end{bmatrix}$\\
+\\$\sigma^\prime(S_2) =
 \begin{bmatrix}
 0.247 & 0.247 \\
 0.246 & 0.246 \\
 \end{bmatrix}$\\
-\\Let $ \delta_1 = -(Y - \hat{Y})\sigma^\prime(S_2)$ which will be later used in
+\\Let $ \delta_3 = (\hat{Y} - Y) \odot \sigma^\prime(S_2)$ which will be later used in
 section 1.2.2\\
-\\ $  \delta_1 =
+\\$\delta_3 = 
 \begin{bmatrix}
 -0.449 & 0.552\\
 0.565 & -0.435 \\
-\end{bmatrix}
+\end{bmatrix} \odot
 \begin{bmatrix}
 0.247 & 0.247 \\
 0.246 & 0.246 \\
@@ -155,20 +160,19 @@ section 1.2.2\\
 -0.111 & 0.136 \\
 0.139 & -0.107 \\
 \end{bmatrix}$\\
-\\$\cfrac{\partial E}{\partial W_2} = H \cdot
+\\$\cfrac{\partial E}{\partial W_2} = 
 \begin{bmatrix}
 -0.111 & 0.136 \\
 0.139 & -0.107 \\
-\end{bmatrix}$\\
+\end{bmatrix} \cdot H^T$\\
 \\$\cfrac{\partial E}{\partial W_2} =
 \begin{bmatrix}
-1 & 1 \\
-0.530 & 0.532 \\
-0.532 & 0.535 \\
-\end{bmatrix} \cdot
-\begin{bmatrix}
 -0.111 & 0.136 \\
 0.139 & -0.107 \\
+\end{bmatrix} \cdot 
+\begin{bmatrix}
+0.530 & 0.532 \\
+0.532 & 0.535 \\
 \end{bmatrix}$\\
 \\$\cfrac{\partial E}{\partial W_2} =
 \begin{bmatrix}
@@ -183,8 +187,7 @@ $\cfrac{\partial E}{\partial W_1} = -(Y- \hat{Y})\cdot
 \\$\cfrac{\partial E}{\partial W_1} = -(Y- \hat{Y})\cdot
 \cfrac{\partial \hat{Y}}{\partial S_2} \cdot \cfrac{\partial S_2}{\partial W_1}$\\
 \\$\cfrac{\partial E}{\partial W_1} = \delta_1 \cdot \cfrac{\partial S_2}{\partial W_1}$\\
-\\$\cfrac{\partial E}{\partial W_1} = \delta_1 \cdot \cfrac{\partial S_2}{\partial H}
-\cdot \cfrac{\partial H}{\partial W_1}$\\
+\\$\cfrac{\partial E}{\partial W_1} = \delta_1 \cdot \cfrac{\partial S_2}{\partial H} \cdot \cfrac{\partial H}{\partial W_1}$\\
 \\$\cfrac{\partial E}{\partial W_1} = \delta_1 \cdot W_2 \cdot
 \cfrac{\partial H}{\partial S_1} \cdot \cfrac{\partial S_1}{\partial W_1}$\\
 \\$\cfrac{\partial E}{\partial W_1} = \delta_1 \cdot W_2 \cdot
